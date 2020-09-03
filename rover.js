@@ -1,5 +1,5 @@
-var Rover = /** @class */ (function () {
-    function Rover(x1, y1, zx, yx) {
+class Rover {
+    constructor(x1, y1, zx, yx) {
         this.pos = {
             x: x1,
             y: y1,
@@ -9,7 +9,7 @@ var Rover = /** @class */ (function () {
             }
         };
     }
-    Rover.prototype.changeDirection = function (dir, turn) {
+    changeDirection(dir, turn) {
         if (dir.x == 0) {
             // Direction is N
             if (dir.y == 1) {
@@ -32,15 +32,15 @@ var Rover = /** @class */ (function () {
             }
             dir.x = 0;
         }
-    };
-    Rover.prototype.getDirection = function (dir) {
+    }
+    getDirection(dir) {
         if (dir.x == 0) {
             return (dir.y == 1) ? "N" : "S";
         }
         return (dir.x == 1) ? "E" : "W";
-    };
-    Rover.prototype.findPath = function (commands, xBound, yBound) {
-        for (var i = 0; i < commands.length; i++) {
+    }
+    findPath(commands, xBound, yBound) {
+        for (let i = 0; i < commands.length; i++) {
             if (commands.charAt(i) == "L" || commands.charAt(i) == "R") {
                 this.changeDirection(this.pos.z, commands.charAt(i));
             }
@@ -55,11 +55,45 @@ var Rover = /** @class */ (function () {
                 throw new Error("invalid commands");
             }
         }
-        console.log(this.pos.x + " " + this.pos.y + " " + this.getDirection(this.pos.z));
-    };
-    return Rover;
-}());
-var r1 = new Rover(1, 2, 0, 1);
-r1.findPath("LMLMLMLMM", 5, 5);
-var r2 = new Rover(3, 3, 1, 0);
-r2.findPath("MMRMMRMRRM", 5, 5);
+        console.log(`${this.pos.x} ${this.pos.y} ${this.getDirection(this.pos.z)}`);
+    }
+}
+function xDirection(z) {
+    if (z == "N" || z == "S") {
+        return 0;
+    }
+    else if (z == "E" || z == "W") {
+        return (z == "E") ? 1 : -1;
+    }
+    throw new Error("invalid z");
+}
+function yDirection(z) {
+    if (z == "N" || z == "S") {
+        return (z == "N") ? 1 : -1;
+    }
+    else if (z == "E" || z == "W") {
+        return 0;
+    }
+    throw new Error("invalid z");
+}
+var readline = require("readline");
+var input = [];
+var rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
+rl.prompt();
+rl.on("line", function (cmd) {
+    input.push(cmd);
+});
+rl.on("close", function (cmd) {
+    const boundaries = input[0].split(" ");
+    const xBound = parseInt(boundaries[0], 10);
+    const yBound = parseInt(boundaries[1], 10);
+    for (let i = 1; i < input.length; i += 2) {
+        const roverVars = input[i].split(" ");
+        let rover = new Rover(parseInt(roverVars[0], 10), parseInt(roverVars[1], 10), xDirection(roverVars[2]), yDirection(roverVars[2]));
+        rover.findPath(input[i + 1], xBound, yBound);
+    }
+    process.exit(0);
+});

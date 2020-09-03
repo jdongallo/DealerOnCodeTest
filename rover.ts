@@ -75,8 +75,52 @@ class Rover {
     }
 }
 
-let r1: Rover = new Rover(1, 2, 0, 1);
-r1.findPath("LMLMLMLMM", 5, 5);
+function xDirection(z: string): number {
+    if (z == "N" || z == "S") {
+        return 0;
+    }
+    else if (z == "E" || z == "W") {
+        return (z == "E") ? 1 : -1;
+    }
+    throw new Error("invalid z");
+}
 
-let r2: Rover = new Rover(3, 3, 1, 0);
-r2.findPath("MMRMMRMRRM", 5, 5);
+function yDirection(z: string): number {
+    if (z == "N" || z == "S") {
+        return (z == "N") ? 1 : -1;
+    }
+    else if (z == "E" || z == "W") {
+        return 0;
+    }
+    throw new Error("invalid z");
+}
+
+
+var readline = require("readline");
+
+var input = [];
+
+var rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
+
+rl.prompt();
+
+rl.on("line", function (cmd) {
+    input.push(cmd);
+});
+
+rl.on("close", function (cmd) {
+    const boundaries = input[0].split(" ");
+    const xBound: number = parseInt(boundaries[0], 10);
+    const yBound: number = parseInt(boundaries[1], 10);
+    
+    for (let i = 1; i < input.length; i += 2) {
+        const roverVars = input[i].split(" ");
+        let rover: Rover = new Rover(parseInt(roverVars[0], 10), parseInt(roverVars[1], 10), 
+            xDirection(roverVars[2]), yDirection(roverVars[2]));
+        rover.findPath(input[i+1], xBound, yBound);
+    }
+    process.exit(0);
+});
