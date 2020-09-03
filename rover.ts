@@ -9,73 +9,74 @@ interface Coords {
     z: Direction;
 }
 
-function changeDirection(dir: Direction, turn: string): void {
-    if (dir.x == 0) {
-        // Direction is N
-        if (dir.y == 1) {
-            dir.x = (turn == "L") ? -1 : 1;
-        }
-        // Direction is S
-        else {
-            dir.x = (turn == "L") ? 1 : -1;
-        }
-        dir.y = 0;
-    }
-    else {
-        // Direction is E
-        if (dir.x == 1) {
-            dir.y = (turn == "L") ? 1 : -1;
-        }
-        // Direction is W
-        else {
-            dir.y = (turn == "L") ? -1 : 1;
-        }
-        dir.x = 0;
-    }
-}
+class Rover {
+    private pos: Coords;
 
-function getDirection(dir: Direction): string {
-    if (dir.x == 0) {
-        return (dir.y == 1) ? "N" : "S";
+    constructor(x1: number, y1: number, zx: number, yx: number) {
+        this.pos = {
+            x: x1,
+            y: y1,
+            z: {
+                x: zx,
+                y: yx
+            }
+        };
     }
-    return (dir.x == 1) ? "E" : "W";
-}
 
-function findPath(pos: Coords, commands: string, xBound: number, yBound: number): void {
-    for (let i = 0; i < commands.length; i++) {
-        if (commands.charAt(i) == "L" || commands.charAt(i) == "R") {
-            changeDirection(pos.z, commands.charAt(i));
+    private changeDirection(dir: Direction, turn: string): void {
+        if (dir.x == 0) {
+            // Direction is N
+            if (dir.y == 1) {
+                dir.x = (turn == "L") ? -1 : 1;
+            }
+            // Direction is S
+            else {
+                dir.x = (turn == "L") ? 1 : -1;
+            }
+            dir.y = 0;
         }
-        else if (commands.charAt(i) == "M") {
-            pos.x += pos.z.x;
-            pos.y += pos.z.y;
-            if (pos.x < 0 || pos.x > xBound || pos.y < 0 || pos.y > yBound) {
-                throw new Error("rover out of bounds");
+        else {
+            // Direction is E
+            if (dir.x == 1) {
+                dir.y = (turn == "L") ? 1 : -1;
+            }
+            // Direction is W
+            else {
+                dir.y = (turn == "L") ? -1 : 1;
+            }
+            dir.x = 0;
+        }
+    }
+
+    getDirection(dir: Direction): string {
+        if (dir.x == 0) {
+            return (dir.y == 1) ? "N" : "S";
+        }
+        return (dir.x == 1) ? "E" : "W";
+    }
+
+    findPath(commands: string, xBound: number, yBound: number): void {
+        for (let i = 0; i < commands.length; i++) {
+            if (commands.charAt(i) == "L" || commands.charAt(i) == "R") {
+                this.changeDirection(this.pos.z, commands.charAt(i));
+            }
+            else if (commands.charAt(i) == "M") {
+                this.pos.x += this.pos.z.x;
+                this.pos.y += this.pos.z.y;
+                if (this.pos.x < 0 || this.pos.x > xBound || this.pos.y < 0 || this.pos.y > yBound) {
+                    throw new Error("rover out of bounds");
+                }
+            }
+            else {
+                throw new Error("invalid commands");
             }
         }
-        else {
-            throw new Error("invalid commands");
-        }
+        console.log(`${this.pos.x} ${this.pos.y} ${this.getDirection(this.pos.z)}`);
     }
-    console.log(`${pos.x} ${pos.y} ${getDirection(pos.z)}`);
 }
 
-let pos: Coords = {
-    x: 1,
-    y: 2,
-    z: {
-        x: 0,
-        y: 1
-    }
-}
-findPath(pos, "LMLMLMLMM", 5, 5);
+let r1: Rover = new Rover(1, 2, 0, 1);
+r1.findPath("LMLMLMLMM", 5, 5);
 
-pos = {
-    x: 3,
-    y: 3,
-    z: {
-        x: 1,
-        y: 0
-    }
-}
-findPath(pos, "MMRMMRMRRM", 5, 5);
+let r2: Rover = new Rover(3, 3, 1, 0);
+r2.findPath("MMRMMRMRRM", 5, 5);
