@@ -1,10 +1,4 @@
-"use strict";
-exports.__esModule = true;
-var console_1 = require("console");
 function changeDirection(dir, turn) {
-    if (turn != "L" && turn != "R") {
-        return;
-    }
     if (dir.x == 0) {
         // Direction is N
         if (dir.y == 1) {
@@ -28,39 +22,45 @@ function changeDirection(dir, turn) {
         dir.x = 0;
     }
 }
-var dir = {
-    x: 0,
-    y: 1
+function getDirection(dir) {
+    if (dir.x == 0) {
+        return (dir.y == 1) ? "N" : "S";
+    }
+    return (dir.x == 1) ? "E" : "W";
+}
+function findPath(pos, commands, xBound, yBound) {
+    for (let i = 0; i < commands.length; i++) {
+        if (commands.charAt(i) == "L" || commands.charAt(i) == "R") {
+            changeDirection(pos.z, commands.charAt(i));
+        }
+        else if (commands.charAt(i) == "M") {
+            pos.x += pos.z.x;
+            pos.y += pos.z.y;
+            if (pos.x < 0 || pos.x > xBound || pos.y < 0 || pos.y > yBound) {
+                throw new Error("rover out of bounds");
+            }
+        }
+        else {
+            throw new Error("invalid commands");
+        }
+    }
+    console.log(`${pos.x} ${pos.y} ${getDirection(pos.z)}`);
+}
+let pos = {
+    x: 1,
+    y: 2,
+    z: {
+        x: 0,
+        y: 1
+    }
 };
-// N to W
-changeDirection(dir, "L");
-console_1.assert(dir.x == -1, "Line 43");
-console_1.assert(dir.y == 0, "Line 44");
-// W to S
-changeDirection(dir, "L");
-console_1.assert(dir.x == 0, "Line 48");
-console_1.assert(dir.y == -1, "Line 49");
-// S to E
-changeDirection(dir, "L");
-console_1.assert(dir.x == 1, "Line 53");
-console_1.assert(dir.y == 0, "Line 54");
-// E to N
-changeDirection(dir, "L");
-console_1.assert(dir.x == 0, "Line 58");
-console_1.assert(dir.y == 1, "Line 59");
-// N to E
-changeDirection(dir, "R");
-console_1.assert(dir.x == 1, "Line 58");
-console_1.assert(dir.y == 0, "Line 59");
-// E to S
-changeDirection(dir, "R");
-console_1.assert(dir.x == 0, "Line 58");
-console_1.assert(dir.y == -1, "Line 59");
-// S to W
-changeDirection(dir, "R");
-console_1.assert(dir.x == -1, "Line 58");
-console_1.assert(dir.y == 0, "Line 59");
-// W to N
-changeDirection(dir, "R");
-console_1.assert(dir.x == 0, "Line 58");
-console_1.assert(dir.y == 1, "Line 59");
+findPath(pos, "LMLMLMLMM", 5, 5);
+pos = {
+    x: 3,
+    y: 3,
+    z: {
+        x: 1,
+        y: 0
+    }
+};
+findPath(pos, "MMRMMRMRRM", 5, 5);

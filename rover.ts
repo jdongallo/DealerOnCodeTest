@@ -1,14 +1,15 @@
-import { assert } from "console";
-
 interface Direction {
     x: number;
     y: number;
 }
 
-function changeDirection(dir: Direction, turn: string) {
-    if (turn != "L" && turn != "R") {
-        return;
-    }
+interface Coords {
+    x: number;
+    y: number;
+    z: Direction;
+}
+
+function changeDirection(dir: Direction, turn: string): void {
     if (dir.x == 0) {
         // Direction is N
         if (dir.y == 1) {
@@ -33,47 +34,48 @@ function changeDirection(dir: Direction, turn: string) {
     }
 }
 
-let dir : Direction = {
-    x: 0,
-    y: 1
-};
+function getDirection(dir: Direction): string {
+    if (dir.x == 0) {
+        return (dir.y == 1) ? "N" : "S";
+    }
+    return (dir.x == 1) ? "E" : "W";
+}
 
-// N to W
-changeDirection(dir, "L");
-assert(dir.x == -1, "Line 43");
-assert(dir.y == 0, "Line 44");
+function findPath(pos: Coords, commands: string, xBound: number, yBound: number): void {
+    for (let i = 0; i < commands.length; i++) {
+        if (commands.charAt(i) == "L" || commands.charAt(i) == "R") {
+            changeDirection(pos.z, commands.charAt(i));
+        }
+        else if (commands.charAt(i) == "M") {
+            pos.x += pos.z.x;
+            pos.y += pos.z.y;
+            if (pos.x < 0 || pos.x > xBound || pos.y < 0 || pos.y > yBound) {
+                throw new Error("rover out of bounds");
+            }
+        }
+        else {
+            throw new Error("invalid commands");
+        }
+    }
+    console.log(`${pos.x} ${pos.y} ${getDirection(pos.z)}`);
+}
 
-// W to S
-changeDirection(dir, "L");
-assert(dir.x == 0, "Line 48");
-assert(dir.y == -1, "Line 49");
+let pos: Coords = {
+    x: 1,
+    y: 2,
+    z: {
+        x: 0,
+        y: 1
+    }
+}
+findPath(pos, "LMLMLMLMM", 5, 5);
 
-// S to E
-changeDirection(dir, "L");
-assert(dir.x == 1, "Line 53");
-assert(dir.y == 0, "Line 54");
-
-// E to N
-changeDirection(dir, "L");
-assert(dir.x == 0, "Line 58");
-assert(dir.y == 1, "Line 59");
-
-// N to E
-changeDirection(dir, "R");
-assert(dir.x == 1, "Line 58");
-assert(dir.y == 0, "Line 59");
-
-// E to S
-changeDirection(dir, "R");
-assert(dir.x == 0, "Line 58");
-assert(dir.y == -1, "Line 59");
-
-// S to W
-changeDirection(dir, "R");
-assert(dir.x == -1, "Line 58");
-assert(dir.y == 0, "Line 59");
-
-// W to N
-changeDirection(dir, "R");
-assert(dir.x == 0, "Line 58");
-assert(dir.y == 1, "Line 59");
+pos = {
+    x: 3,
+    y: 3,
+    z: {
+        x: 1,
+        y: 0
+    }
+}
+findPath(pos, "MMRMMRMRRM", 5, 5);
